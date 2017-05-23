@@ -35,6 +35,7 @@ var UserSchema = new mongoose.Schema({
 	}]
 });
 
+//Instance Methods
 //overriding toJSON method to return only required values from the server
 UserSchema.methods.toJSON = function(){
 	var user = this;
@@ -54,6 +55,28 @@ UserSchema.methods.generateAuthToken = function(){
 		return token;
 	});
 };
+
+//Model method
+UserSchema.statics.findByToken = function(token) {
+	var User = this;
+	var decoded;
+
+	try{
+		decoded = jwt.verify(token, 'abc123');
+	} catch(e){
+		// return new Promise((resolve, reject) => {
+		// 	reject();
+		// });
+
+		return Promise.reject();
+	}
+
+	return User.findOne({ 
+		'_id': decoded._id,
+		'tokens.token': token,
+		'tokens.access': 'auth'	//accessing nested properties
+	});
+}
 
 var User = mongoose.model('User', UserSchema);
 
