@@ -57,6 +57,18 @@ UserSchema.methods.generateAuthToken = function(){
 	});
 };
 
+UserSchema.methods.removeToken = function(token){
+	var user = this;
+
+	//$pull is a mongoDB operator, which removes an item from an array depending on a criteria
+	return user.update({
+		$pull: {
+			tokens: { token }
+		}
+		// pull from tokens array, any object on the array that has token property equal to token
+	});
+};
+
 //Model method
 UserSchema.statics.findByToken = function(token) {
 	var User = this;
